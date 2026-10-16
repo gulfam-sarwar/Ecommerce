@@ -1,0 +1,109 @@
+CREATE TABLE USERS (
+    user_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    Attribute INT NOT NULL,
+    PRIMARY KEY (user_id),
+    UNIQUE (email)
+);
+
+CREATE TABLE ORDERS (
+    order_id INT NOT NULL,
+    user_id INT NOT NULL,
+    address_id INT NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    Attribute INT NOT NULL,
+    PRIMARY KEY (order_id),
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id)
+);
+
+CREATE TABLE PAYMENTS (
+    payment_id INT NOT NULL,
+    order_id INT NOT NULL,
+    user_id INT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    PRIMARY KEY (payment_id),
+    FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id)
+);
+
+CREATE TABLE ADDRESSES (
+    address_id INT NOT NULL,
+    user_id INT NOT NULL,
+    address_line VARCHAR(255) NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    state VARCHAR(100) NOT NULL,
+    country VARCHAR(100) NOT NULL,
+    postal_code VARCHAR(20) NOT NULL,
+    PRIMARY KEY (address_id),
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id)
+);
+
+CREATE TABLE PRODUCTS (
+    products_id INT NOT NULL,
+    name VARCHAR(150) NOT NULL,
+    description TEXT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    stock INT NOT NULL,
+    PRIMARY KEY (products_id)
+);
+
+CREATE TABLE ORDER_DETAILS (
+    order_item_id INT NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    order_id INT NOT NULL,
+    products_id INT NOT NULL,
+    PRIMARY KEY (order_item_id),
+    FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
+    FOREIGN KEY (products_id) REFERENCES PRODUCTS(products_id)
+);
+
+CREATE TABLE INVENTORY (
+    inventory_id INT NOT NULL,
+    quantity INT NOT NULL,
+    PRIMARY KEY (inventory_id)
+);
+
+CREATE TABLE SESSION (
+    session_id INT NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    Attribute INT NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    user_id INT NOT NULL,
+    PRIMARY KEY (session_id),
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id),
+    UNIQUE (password_hash)
+);
+
+CREATE TABLE CART_ITEMS (
+    cart_it INT NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    quantity INT NOT NULL,
+    item_name VARCHAR(150) NOT NULL,
+    products_id INT NOT NULL,
+    user_id INT NOT NULL,
+    PRIMARY KEY (cart_it),
+    FOREIGN KEY (products_id) REFERENCES PRODUCTS(products_id),
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id)
+);
+
+CREATE TABLE HAS (
+    order_id INT NOT NULL,
+    payment_id INT NOT NULL,
+    PRIMARY KEY (order_id, payment_id),
+    FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
+    FOREIGN KEY (payment_id) REFERENCES PAYMENTS(payment_id)
+);
+
+CREATE TABLE IS_IN (
+    inventory_id INT NOT NULL,
+    products_id INT NOT NULL,
+    PRIMARY KEY (inventory_id, products_id),
+    FOREIGN KEY (inventory_id) REFERENCES INVENTORY(inventory_id),
+    FOREIGN KEY (products_id) REFERENCES PRODUCTS(products_id)
+);
