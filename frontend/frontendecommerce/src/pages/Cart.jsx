@@ -6,14 +6,12 @@ export default function Cart() {
   const [items, setItems] = useState([]);
   const [error, setError] = useState('');
 
-  // Ask the backend for the cart items
   const loadCart = () => {
     api('/cart')
       .then(setItems)
       .catch((err) => setError(err.message));
   };
 
-  // Run loadCart once when the page opens
   useEffect(() => {
     loadCart();
   }, []);
@@ -29,7 +27,6 @@ export default function Cart() {
     loadCart();
   };
 
-  // Add up price x quantity of every item
   const total = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
 
   return (

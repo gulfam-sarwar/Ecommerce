@@ -1,11 +1,9 @@
-// Manage products: list, add, edit and delete.
-// Admin and staff can add/edit. Only admin can delete.
 
 import { useEffect, useState } from 'react';
 import { api } from '../../api.js';
 import { useAuth } from '../../AuthContext.jsx';
+import Home from '../Home.jsx';
 
-// An empty product form
 const emptyForm = { name: '', description: '', price: '', stock: '', image_url: '' };
 
 export default function AdminProducts() {
@@ -13,7 +11,7 @@ export default function AdminProducts() {
 
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState(emptyForm);
-  const [editingId, setEditingId] = useState(null); // null = we are adding a NEW product
+  const [editingId, setEditingId] = useState(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -29,7 +27,6 @@ export default function AdminProducts() {
 
   const handleChange = (field) => (e) => setForm({ ...form, [field]: e.target.value });
 
-  // Click "Edit": copy the product into the form
   const startEdit = (product) => {
     setEditingId(product.product_id);
     setForm({
@@ -47,7 +44,6 @@ export default function AdminProducts() {
     setForm(emptyForm);
   };
 
-  // Submit the form: create a new product OR update the one being edited
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -69,7 +65,6 @@ export default function AdminProducts() {
   };
 
   const handleDelete = async (product) => {
-    // confirm() shows a "Are you sure?" popup
     if (!window.confirm(`Delete "${product.name}"?`)) return;
 
     setError('');
@@ -90,7 +85,6 @@ export default function AdminProducts() {
       {message && <p className="alert alert-success">{message}</p>}
       {error && <p className="alert alert-error">{error}</p>}
 
-      {/* ---- Add / Edit form ---- */}
       <form className="panel form form-grid" onSubmit={handleSubmit}>
         <h3 className="full">{editingId ? `Edit product #${editingId}` : 'Add a new product'}</h3>
 
@@ -131,7 +125,6 @@ export default function AdminProducts() {
         </div>
       </form>
 
-      {/* ---- Product list ---- */}
       <div className="table-wrap">
         <table>
           <thead>
@@ -150,14 +143,12 @@ export default function AdminProducts() {
                 <td>{product.name}</td>
                 <td>Rs. {Number(product.price).toLocaleString()}</td>
                 <td>
-                  {/* Red when the stock is low */}
                   <span className={product.stock <= 5 ? 'text-red' : ''}>{product.stock}</span>
                 </td>
                 <td className="button-row">
                   <button className="btn btn-small" onClick={() => startEdit(product)}>
                     Edit
                   </button>
-                  {/* Only admins see the Delete button */}
                   {isAdmin && (
                     <button className="btn btn-small btn-danger" onClick={() => handleDelete(product)}>
                       Delete
@@ -169,6 +160,7 @@ export default function AdminProducts() {
           </tbody>
         </table>
       </div>
+      <Home />
     </>
   );
 }

@@ -1,9 +1,7 @@
-// See all orders and change their status.
 
 import { useEffect, useState } from 'react';
 import { api } from '../../api.js';
 
-// The statuses an order can have, in order
 const STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 
 export default function AdminOrders() {
@@ -25,7 +23,6 @@ export default function AdminOrders() {
     setError('');
     setMessage('');
 
-    // Cancelling is permanent, so ask first
     if (status === 'cancelled' && !window.confirm('Cancel this order? This cannot be undone.')) {
       return;
     }
@@ -71,7 +68,6 @@ export default function AdminOrders() {
           <div className="order-foot">
             <p className="total">Total: Rs. {Number(order.total_amount).toLocaleString()}</p>
 
-            {/* A cancelled order can no longer be changed */}
             {order.status === 'cancelled' ? (
               <span className="muted">Cancelled orders cannot be changed</span>
             ) : (

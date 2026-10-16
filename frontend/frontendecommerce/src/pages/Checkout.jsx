@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
 
-// Empty form values for a new address
 const emptyAddress = {
   address_line: '',
   city: '',
@@ -14,18 +13,16 @@ const emptyAddress = {
 export default function Checkout() {
   const navigate = useNavigate();
 
-  const [addresses, setAddresses] = useState([]); // saved addresses
-  const [addressId, setAddressId] = useState(''); // the selected address
-  const [method, setMethod] = useState('cod'); // payment method
-  const [form, setForm] = useState(emptyAddress); // the "new address" form
+  const [addresses, setAddresses] = useState([]);
+  const [addressId, setAddressId] = useState(''); 
+  const [method, setMethod] = useState('cod'); 
+  const [form, setForm] = useState(emptyAddress);
   const [error, setError] = useState('');
 
-  // Load the user's saved addresses
   const loadAddresses = async () => {
     const list = await api('/addresses');
     setAddresses(list);
 
-    // Select the first address automatically
     if (list.length > 0 && !addressId) {
       setAddressId(String(list[0].address_id));
     }
@@ -33,7 +30,7 @@ export default function Checkout() {
 
   useEffect(() => {
     loadAddresses().catch((err) => setError(err.message));
-  }, []); // eslint-disable-line
+  }, []); 
 
   const handleChange = (field) => (e) => setForm({ ...form, [field]: e.target.value });
 
@@ -43,7 +40,7 @@ export default function Checkout() {
     try {
       const result = await api('/addresses', { method: 'POST', body: form });
       setForm(emptyAddress);
-      setAddressId(String(result.address_id)); // select the new address
+      setAddressId(String(result.address_id)); 
       await loadAddresses();
     } catch (err) {
       setError(err.message);
@@ -57,7 +54,7 @@ export default function Checkout() {
         method: 'POST',
         body: { address_id: Number(addressId), payment_method: method },
       });
-      navigate('/orders'); // show the order list after success
+      navigate('/orders'); 
     } catch (err) {
       setError(err.message);
     }
@@ -69,7 +66,6 @@ export default function Checkout() {
       {error && <p className="alert alert-error">{error}</p>}
 
       <div className="two-columns">
-        {/* Left side: address + payment */}
         <div className="panel">
           <h3>Delivery address</h3>
 
@@ -103,7 +99,6 @@ export default function Checkout() {
           </p>
         </div>
 
-        {/* Right side: new address form */}
         <form className="panel form" onSubmit={saveAddress}>
           <h3>Add a new address</h3>
           <input placeholder="Address line" required value={form.address_line} onChange={handleChange('address_line')} />

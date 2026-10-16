@@ -21,7 +21,6 @@ export default function Orders() {
         <div className="card order-card" key={order.order_id}>
           <div className="order-head">
             <strong>Order #{order.order_id}</strong>
-            {/* The CSS class changes with the status, e.g. "badge-shipped" */}
             <span className={`badge badge-${order.status}`}>{order.status}</span>
           </div>
 

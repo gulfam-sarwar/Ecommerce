@@ -27,7 +27,7 @@ export default function AdminLayout() {
         </nav>
 
         <div className="sidebar-bottom">
-          <Link to="/"> Back to shop</Link>
+          {/* <Link to="/"> Back to shop</Link> */}
           <button className="btn btn-small btn-outline-light" onClick={handleLogout}>
             Logout
           </button>

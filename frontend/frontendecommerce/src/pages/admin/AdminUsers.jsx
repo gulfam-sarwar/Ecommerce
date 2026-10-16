@@ -1,9 +1,3 @@
-// Admin only: see all users and change their role.
-//
-// Roles:
-//   customer - can shop
-//   staff    - can manage products and orders
-//   admin    - can do everything, including managing users
 
 import { useEffect, useState } from 'react';
 import { api } from '../../api.js';
@@ -12,7 +6,7 @@ import { useAuth } from '../../AuthContext.jsx';
 const ROLES = ['customer', 'staff', 'admin'];
 
 export default function AdminUsers() {
-  const { user: currentUser } = useAuth(); // the admin who is logged in now
+  const { user: currentUser } = useAuth(); 
 
   const [users, setUsers] = useState([]);
   const [message, setMessage] = useState('');
@@ -66,7 +60,6 @@ export default function AdminUsers() {
                 <td>{u.email}</td>
                 <td>{u.phone}</td>
                 <td>
-                  {/* You cannot change your own role */}
                   {u.user_id === currentUser.user_id ? (
                     <span className={`role-tag role-${u.role}`}>{u.role} (you)</span>
                   ) : (
