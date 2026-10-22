@@ -52,9 +52,11 @@ export default function AdminOrders() {
           </div>
 
           <p>
-            <strong>{order.customer}</strong> · {order.email} · {order.phone}
+            <strong>{order.customer}</strong>{' '}
+            {order.is_guest ? <span className="role-tag role-customer">guest</span> : null} ·{' '}
+            {order.email} · {order.phone}
           </p>
-          <p className="muted">📍 {order.address}</p>
+          <p className="muted"> {order.address}</p>
           <p className="muted">{new Date(order.created_at).toLocaleString()}</p>
 
           <ul>

@@ -9,7 +9,7 @@ export default function ShopLayout() {
     <>
       <header className="navbar">
         <Link to="/" className="brand">
-          Shop
+           CLEANIFY
         </Link>
 
         <nav className="nav-links">

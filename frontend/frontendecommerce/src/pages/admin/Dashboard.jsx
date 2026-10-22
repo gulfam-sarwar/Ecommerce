@@ -16,12 +16,12 @@ export default function Dashboard() {
   if (!stats) return <p className="muted">Loading...</p>;
 
   const cards = [
-    { label: 'Revenue', value: `Rs. ${Number(stats.revenue).toLocaleString()}`},
-    { label: 'Total orders', value: stats.totalOrders },
-    { label: 'Pending orders', value: stats.pendingOrders },
-    { label: 'Products', value: stats.totalProducts },
-    { label: 'Low stock (5 or less)', value: stats.lowStockProducts },
-    { label: 'Customers', value: stats.totalCustomers },
+    { label: 'Revenue', value: `Rs. ${Number(stats.revenue).toLocaleString()}`, color: 'green' },
+    { label: 'Total orders', value: stats.totalOrders, color: 'blue' },
+    { label: 'Pending orders', value: stats.pendingOrders, color: 'orange' },
+    { label: 'Products', value: stats.totalProducts, color: 'purple' },
+    { label: 'Low stock (5 or less)', value: stats.lowStockProducts, color: 'red' },
+    { label: 'Customers', value: stats.totalCustomers, color: 'teal' },
   ];
 
   return (
@@ -30,7 +30,7 @@ export default function Dashboard() {
 
       <div className="stat-grid">
         {cards.map((card) => (
-          <div className="stat-card" key={card.label}>
+          <div className={`stat-card stat-${card.color}`} key={card.label}>
             <p className="stat-label">{card.label}</p>
             <p className="stat-value">{card.value}</p>
           </div>
@@ -63,7 +63,7 @@ export default function Dashboard() {
                 <td>{order.customer}</td>
                 <td>Rs. {Number(order.total_amount).toLocaleString()}</td>
                 <td>
-                  <span className={`badge badge`}>{order.status}</span>
+                  <span className={`badge badge-${order.status}`}>{order.status}</span>
                 </td>
                 <td>{new Date(order.created_at).toLocaleDateString()}</td>
               </tr>

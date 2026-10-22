@@ -1,3 +1,10 @@
+// Creates (or upgrades) an admin account so you can log in to the admin panel.
+//
+// Run it once with:   npm run seed:admin
+//
+// Login after running:
+//   email:    admin@shop.com
+//   password: admin123      <- change this after your first login!
 
 import bcrypt from 'bcryptjs';
 import pool from './db.js';

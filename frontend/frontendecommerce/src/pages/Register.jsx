@@ -1,15 +1,17 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
 
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const comeBackTo = location.state?.from;
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
   const [error, setError] = useState('');
 
-  // Returns a function that updates ONE field of the form
   const handleChange = (field) => (e) => setForm({ ...form, [field]: e.target.value });
 
   const handleSubmit = async (e) => {
@@ -18,7 +20,7 @@ export default function Register() {
 
     try {
       await register(form);
-      navigate('/');
+      navigate(comeBackTo || '/');
     } catch (err) {
       setError(err.message);
     }
@@ -62,7 +64,10 @@ export default function Register() {
       </form>
 
       <p className="muted">
-        Already registered? <Link to="/login">Login</Link>
+        Already registered?{' '}
+        <Link to="/login" state={{ from: comeBackTo }}>
+          Login
+        </Link>
       </p>
     </div>
   );

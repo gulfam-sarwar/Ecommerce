@@ -15,6 +15,9 @@ export default function AdminLayout() {
     <div className="admin">
       <aside className="sidebar">
         <h2 className="sidebar-title"> Admin</h2>
+        <p className="sidebar-role">
+          {user.name} <span className={`role-tag role-${user.role}`}>{user.role}</span>
+        </p>
 
         <nav className="sidebar-links">
           <NavLink to="/admin" end>
@@ -27,7 +30,7 @@ export default function AdminLayout() {
         </nav>
 
         <div className="sidebar-bottom">
-          {/* <Link to="/"> Back to shop</Link> */}
+          <Link to="/">← Back to shop</Link>
           <button className="btn btn-small btn-outline-light" onClick={handleLogout}>
             Logout
           </button>

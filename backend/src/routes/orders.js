@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import pool from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
+import { sendOrderConfirmation } from '../utils/mailer.js';
 
 const router = Router();
 router.use(requireAuth);
@@ -18,7 +19,8 @@ router.post('/checkout', async (req, res, next) => {
     await conn.beginTransaction();
 
     const [addr] = await conn.query(
-      'SELECT 1 FROM ADDRESSES WHERE address_id = ? AND user_id = ?',
+      `SELECT address_line, city, state, country, postal_code
+         FROM ADDRESSES WHERE address_id = ? AND user_id = ?`,
       [address_id, req.user.user_id]
     );
     if (!addr.length) {
@@ -67,6 +69,17 @@ router.post('/checkout', async (req, res, next) => {
     await conn.query('DELETE FROM CART_ITEMS WHERE user_id = ?', [req.user.user_id]);
 
     await conn.commit();
+
+    sendOrderConfirmation({
+      to: req.user.email,
+      name: req.user.name,
+      orderId: order.insertId,
+      total: total.toFixed(2),
+      paymentMethod: payment_method,
+      items,
+      address: addr[0],
+    });
+
     res.status(201).json({ order_id: order.insertId, total_amount: total.toFixed(2) });
   } catch (err) {
     await conn.rollback();

@@ -34,7 +34,25 @@ body {
   margin: 0;
   font-family: var(--font-body);
   font-size: 15px;
-  background: var(--bg);
+  /* Page background, from top layer to bottom layer:
+       1) a green-teal glow in the top-left
+       2) a blue glow in the top-right
+       3) a violet glow in the bottom-left
+       4) an amber glow in the bottom-right
+       5) a faint dot grid (matches the "blueprint" look of the hero)
+       6) a soft mint-to-sky gradient as the base
+     To make a color stronger, raise its last number (0.35 -> 0.5).
+     "fixed" keeps the background still while the page scrolls. */
+  background-color: #e4f2ee;
+  background-image:
+    radial-gradient(900px 600px at 0% 0%, rgba(11, 138, 111, 0.35), transparent 70%),
+    radial-gradient(800px 560px at 100% 0%, rgba(59, 130, 246, 0.28), transparent 70%),
+    radial-gradient(800px 600px at 0% 100%, rgba(139, 92, 246, 0.24), transparent 70%),
+    radial-gradient(900px 600px at 100% 100%, rgba(245, 166, 35, 0.32), transparent 70%),
+    radial-gradient(rgba(18, 38, 43, 0.1) 1px, transparent 1px),
+    linear-gradient(160deg, #e3f4ee 0%, #e6eef9 50%, #f6efe0 100%);
+  background-size: auto, auto, auto, auto, 24px 24px, auto;
+  background-attachment: fixed;
   color: var(--text);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
@@ -894,6 +912,13 @@ tr:last-child td {
   }
   .admin-content {
     padding: 20px 14px 36px;
+  }
+}
+
+/* Some phones handle a "fixed" background badly, so let it scroll there */
+@media (max-width: 800px) {
+  body {
+    background-attachment: scroll;
   }
 }
 

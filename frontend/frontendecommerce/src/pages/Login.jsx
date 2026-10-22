@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const comeBackTo = location.state?.from;
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -19,7 +22,7 @@ export default function Login() {
       if (user.role === 'admin' || user.role === 'staff') {
         navigate('/admin');
       } else {
-        navigate('/');
+        navigate(comeBackTo || '/');
       }
     } catch (err) {
       setError(err.message);
@@ -31,6 +34,9 @@ export default function Login() {
       <h2>Welcome back</h2>
       <p className="muted">Login to continue shopping</p>
 
+      {comeBackTo === '/checkout' && (
+        <p className="alert alert-info">Login to check out. Your cart will be kept.</p>
+      )}
       {error && <p className="alert alert-error">{error}</p>}
 
       <form className="form" onSubmit={handleSubmit}>
@@ -58,7 +64,10 @@ export default function Login() {
       </form>
 
       <p className="muted">
-        No account yet? <Link to="/register">Register</Link>
+        No account yet?{' '}
+        <Link to="/register" state={{ from: comeBackTo }}>
+          Register
+        </Link>
       </p>
     </div>
   );

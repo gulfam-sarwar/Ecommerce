@@ -44,6 +44,10 @@ CREATE TABLE ORDERS (
     total_amount DECIMAL(10, 2) NOT NULL,
     status VARCHAR(30) NOT NULL DEFAULT 'pending',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- Filled only when someone checks out without an account (guest checkout)
+    guest_name VARCHAR(100) NULL,
+    guest_email VARCHAR(150) NULL,
+    guest_phone VARCHAR(20) NULL,
     PRIMARY KEY (order_id),
     FOREIGN KEY (user_id) REFERENCES USERS(user_id),
     FOREIGN KEY (address_id) REFERENCES ADDRESSES(address_id)
@@ -104,3 +108,18 @@ INSERT INTO PRODUCTS (name, description, price, stock, image_url) VALUES
 ('Mechanical Keyboard', 'Blue switch mechanical keyboard.', 6999.00, 25, NULL),
 ('USB-C Hub', '7-in-1 USB-C hub with HDMI.', 3499.00, 40, NULL),
 ('Laptop Stand', 'Adjustable aluminium laptop stand.', 2299.00, 30, NULL);
+
+-- Cart for visitors who are not logged in.
+-- "device_id" is a random UUID the browser creates and keeps in localStorage.
+-- When the visitor logs in, these rows are moved into CART_ITEMS.
+CREATE TABLE GUEST_CART_ITEMS (
+    guest_cart_item_id INT NOT NULL AUTO_INCREMENT,
+    device_id CHAR(36) NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (guest_cart_item_id),
+    UNIQUE (device_id, product_id),
+    FOREIGN KEY (product_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE,
+    CHECK (quantity > 0)
+);

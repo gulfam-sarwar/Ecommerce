@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
 import { useAuth } from '../AuthContext.jsx';
 
@@ -9,7 +8,6 @@ export default function Home() {
   const [message, setMessage] = useState('');
 
   const { user } = useAuth();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -22,14 +20,11 @@ export default function Home() {
   }, [search]);
 
   const addToCart = async (productId) => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
+    const cartPath = user ? '/cart' : '/guest-cart';
 
     try {
-      await api('/cart', { method: 'POST', body: { product_id: productId, quantity: 1 } });
-      setMessage('Product added to cart');
+      await api(cartPath, { method: 'POST', body: { product_id: productId, quantity: 1 } });
+      setMessage(' Added to cart');
     } catch (err) {
       setMessage(err.message);
     }
@@ -56,7 +51,7 @@ export default function Home() {
         {products.map((product) => (
           <div className="card product-card" key={product.product_id}>
             <div className="product-image">
-              {product.image_url ? <img src={product.image_url} alt={product.name} /> : ''}
+              {product.image_url ? <img src={product.image_url} alt={product.name} /> : '📦'}
             </div>
 
             <h3>{product.name}</h3>

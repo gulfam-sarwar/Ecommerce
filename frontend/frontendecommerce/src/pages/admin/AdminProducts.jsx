@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api.js';
 import { useAuth } from '../../AuthContext.jsx';
-import Home from '../Home.jsx';
 
 const emptyForm = { name: '', description: '', price: '', stock: '', image_url: '' };
 
@@ -11,7 +10,7 @@ export default function AdminProducts() {
 
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState(emptyForm);
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState(null); 
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -160,7 +159,6 @@ export default function AdminProducts() {
           </tbody>
         </table>
       </div>
-      <Home />
     </>
   );
 }

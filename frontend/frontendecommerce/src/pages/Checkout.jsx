@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
+import { useAuth } from '../AuthContext.jsx';
+import GuestCheckout from './GuestCheckout.jsx';
 
 const emptyAddress = {
   address_line: '',
@@ -10,7 +12,15 @@ const emptyAddress = {
   postal_code: '',
 };
 
+
 export default function Checkout() {
+  const { user, loading } = useAuth();
+
+  if (loading) return <p className="muted">Loading...</p>;
+  return user ? <AccountCheckout /> : <GuestCheckout />;
+}
+
+function AccountCheckout() {
   const navigate = useNavigate();
 
   const [addresses, setAddresses] = useState([]);
@@ -54,7 +64,7 @@ export default function Checkout() {
         method: 'POST',
         body: { address_id: Number(addressId), payment_method: method },
       });
-      navigate('/orders'); 
+      navigate('/orders');
     } catch (err) {
       setError(err.message);
     }

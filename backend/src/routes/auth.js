@@ -3,6 +3,8 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import pool from '../db.js';
 import { hashToken, requireAuth } from '../middleware/auth.js';
+import { mergeGuestCart } from '../utils/guestCart.js';
+import { sendWelcomeEmail } from '../utils/mailer.js';
 
 const router = Router();
 const SESSION_DAYS = 7;
@@ -25,6 +27,9 @@ router.post('/register', async (req, res, next) => {
     if (password.length < 6)
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
 
+    if (String(email).toLowerCase().endsWith('@system.local'))
+      return res.status(400).json({ error: 'Please use a real email address' });
+
     const [exists] = await pool.query('SELECT 1 FROM USERS WHERE email = ?', [email]);
     if (exists.length) return res.status(409).json({ error: 'Email already registered' });
 
@@ -33,6 +38,11 @@ router.post('/register', async (req, res, next) => {
       'INSERT INTO USERS (name, email, password_hash, phone) VALUES (?, ?, ?, ?)',
       [name, email, hash, phone]
     );
+
+    await mergeGuestCart(result.insertId, req.headers['x-device-id']);
+
+    sendWelcomeEmail({ name, email });
+
     const token = await createSession(result.insertId);
     res.status(201).json({
       token,
@@ -48,8 +58,10 @@ router.post('/login', async (req, res, next) => {
     const { email, password } = req.body;
     const [rows] = await pool.query('SELECT * FROM USERS WHERE email = ?', [email]);
     const user = rows[0];
-    if (!user || !(await bcrypt.compare(password || '', user.password_hash)))
+    if (!user || user.role === 'guest' || !(await bcrypt.compare(password || '', user.password_hash)))
       return res.status(401).json({ error: 'Invalid email or password' });
+
+    await mergeGuestCart(user.user_id, req.headers['x-device-id']);
 
     const token = await createSession(user.user_id);
     res.json({

@@ -1,30 +1,46 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api.js';
+import { useAuth } from '../AuthContext.jsx';
 
 export default function Cart() {
+  const { user, loading } = useAuth();
+
   const [items, setItems] = useState([]);
   const [error, setError] = useState('');
 
+
+  const cartPath = user ? '/cart' : '/guest-cart';
+
   const loadCart = () => {
-    api('/cart')
+    setError('');
+    api(cartPath)
       .then(setItems)
       .catch((err) => setError(err.message));
   };
 
+  
   useEffect(() => {
-    loadCart();
-  }, []);
+    if (!loading) loadCart();
+  }, [loading, user]); 
 
   const changeQuantity = async (cartItemId, newQuantity) => {
     if (newQuantity < 1) return;
-    await api(`/cart/${cartItemId}`, { method: 'PUT', body: { quantity: newQuantity } });
-    loadCart();
+    try {
+      await api(`${cartPath}/${cartItemId}`, { method: 'PUT', body: { quantity: newQuantity } });
+      loadCart();
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const removeItem = async (cartItemId) => {
-    await api(`/cart/${cartItemId}`, { method: 'DELETE' });
-    loadCart();
+    try {
+      await api(`${cartPath}/${cartItemId}`, { method: 'DELETE' });
+      loadCart();
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const total = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
@@ -32,6 +48,13 @@ export default function Cart() {
   return (
     <>
       <h2 className="page-title">Your cart</h2>
+
+      {!loading && !user && items.length > 0 && (
+        <p className="alert alert-info">
+          Your cart is saved on this device. You can check out as a guest, no account needed.
+        </p>
+      )}
+
       {error && <p className="alert alert-error">{error}</p>}
 
       {items.length === 0 ? (
@@ -89,10 +112,21 @@ export default function Cart() {
 
           <div className="cart-footer">
             <p className="total">Total: Rs. {total.toLocaleString()}</p>
+
             <Link to="/checkout" className="btn">
               Proceed to checkout
             </Link>
           </div>
+
+          {!user && (
+            <p className="muted">
+              Have an account?{' '}
+              <Link to="/login" state={{ from: '/checkout' }}>
+                Login
+              </Link>{' '}
+              to use your saved addresses and see your order history.
+            </p>
+          )}
         </>
       )}
     </>

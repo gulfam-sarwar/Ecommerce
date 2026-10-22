@@ -10,6 +10,7 @@ import Register from './pages/Register.jsx';
 import Cart from './pages/Cart.jsx';
 import Checkout from './pages/Checkout.jsx';
 import Orders from './pages/Orders.jsx';
+import OrderSuccess from './pages/OrderSuccess.jsx';
 
 import AdminLayout from './pages/admin/AdminLayout.jsx';
 import Dashboard from './pages/admin/Dashboard.jsx';
@@ -25,12 +26,13 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route path="/cart" element={<RoleRoute><Cart /></RoleRoute>} />
-        <Route path="/checkout" element={<RoleRoute><Checkout /></RoleRoute>} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/order-success" element={<OrderSuccess />} />
+
         <Route path="/orders" element={<RoleRoute><Orders /></RoleRoute>} />
       </Route>
 
-  
       <Route
         path="/admin"
         element={

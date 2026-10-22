@@ -1,4 +1,3 @@
-
 import { Router } from 'express';
 import pool from '../db.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
@@ -26,7 +25,8 @@ router.get('/stats', requireRole('admin', 'staff'), async (req, res, next) => {
     );
 
     const [recentOrders] = await pool.query(
-      `SELECT o.order_id, o.total_amount, o.status, o.created_at, u.name AS customer
+      `SELECT o.order_id, o.total_amount, o.status, o.created_at,
+              COALESCE(o.guest_name, u.name) AS customer
          FROM ORDERS o JOIN USERS u ON u.user_id = o.user_id
         ORDER BY o.order_id DESC LIMIT 5`
     );
@@ -45,12 +45,14 @@ router.get('/stats', requireRole('admin', 'staff'), async (req, res, next) => {
   }
 });
 
-
 router.get('/orders', requireRole('admin', 'staff'), async (req, res, next) => {
   try {
     const [orders] = await pool.query(
       `SELECT o.order_id, o.total_amount, o.status, o.created_at,
-              u.name AS customer, u.email, u.phone,
+              COALESCE(o.guest_name, u.name) AS customer,
+              COALESCE(o.guest_email, u.email) AS email,
+              COALESCE(o.guest_phone, u.phone) AS phone,
+              (o.guest_name IS NOT NULL) AS is_guest,
               CONCAT(a.address_line, ', ', a.city, ', ', a.state, ', ', a.country) AS address
          FROM ORDERS o
          JOIN USERS u ON u.user_id = o.user_id
@@ -80,7 +82,6 @@ router.get('/orders', requireRole('admin', 'staff'), async (req, res, next) => {
   }
 });
 
-
 router.put('/orders/:id/status', requireRole('admin', 'staff'), async (req, res, next) => {
   const { status } = req.body;
   const orderId = req.params.id;
@@ -88,7 +89,6 @@ router.put('/orders/:id/status', requireRole('admin', 'staff'), async (req, res,
   if (!ORDER_STATUSES.includes(status)) {
     return res.status(400).json({ error: 'Invalid status' });
   }
-
 
   const conn = await pool.getConnection();
   try {
@@ -139,14 +139,13 @@ router.put('/orders/:id/status', requireRole('admin', 'staff'), async (req, res,
 router.get('/users', requireRole('admin'), async (req, res, next) => {
   try {
     const [users] = await pool.query(
-      'SELECT user_id, name, email, phone, role, created_at FROM USERS ORDER BY user_id'
+      "SELECT user_id, name, email, phone, role, created_at FROM USERS WHERE role <> 'guest' ORDER BY user_id"
     );
     res.json(users);
   } catch (err) {
     next(err);
   }
 });
-
 
 router.put('/users/:id/role', requireRole('admin'), async (req, res, next) => {
   try {
@@ -168,3 +167,21 @@ router.put('/users/:id/role', requireRole('admin'), async (req, res, next) => {
 });
 
 export default router;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
